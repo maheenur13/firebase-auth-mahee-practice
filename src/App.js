@@ -43,7 +43,19 @@ function App() {
     //  console .log('signed in')
   }
   const handleSignOut=()=>{
-    console.log('singed out');
+    firebase.auth().signOut()
+    .then(res=>{
+      const signOut={
+        isSignedIn:false,
+        name:'',
+        photo:'',
+        email:''
+      }
+      setUser(signOut);
+    })
+    .catch(err=>{
+      console.log(err);
+    })
   }
   return (
     <div className="App">
