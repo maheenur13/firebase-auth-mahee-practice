@@ -1,7 +1,13 @@
 .App {
   text-align: center;
 }
-
+.btn-design{
+  padding: 10px 30px;
+  background-color:rgb(59, 59, 116);
+  /* outline:none; */
+  border: none ;
+  color: white;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
