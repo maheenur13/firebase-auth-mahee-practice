@@ -94,8 +94,9 @@ function App() {
     newUserInfo.success = true;
     newUserInfo.error='';
     setUser(newUserInfo);
+    updateUserInfo(user.name);
     // const user = userCredential.user;
-    console.log(user);
+    console.log('maheee',user.name);
     // ...
   })
   .catch((error) => {
@@ -110,12 +111,13 @@ function App() {
 }
 if(!newUser && user.email && user.password){
   firebase.auth().signInWithEmailAndPassword(user.email, user.password)
-  .then((userCredential) => {
+  .then((res) => {
     // Signed in
     const newUserInfo ={...user};
     newUserInfo.success = true;
     newUserInfo.error='';
     setUser(newUserInfo);
+    console.log(res.user)
     // var user = userCredential.user;
     // ...
   })
@@ -130,7 +132,18 @@ if(!newUser && user.email && user.password){
 }
   e.preventDefault();
   }
-  console.log(user.success);
+const updateUserInfo=name =>{
+  const user = firebase.auth().currentUser;
+console.log('name in update function',name);
+  user.updateProfile({
+  displayName: name
+  }).then(function() {
+  console.log('user name successfully updated!')
+  // Update successful.
+  }).catch(function(error) {
+  // An error happened.
+});
+}
   return (
     <div className="App">
       <header className="App-header">
@@ -152,7 +165,7 @@ if(!newUser && user.email && user.password){
          { newUser && <input type="text" name="name" onBlur={handleChange} placeholder="Enter Your Name" required/>}
           <input type="email" name="email" onBlur={handleChange} placeholder="Enter Your Email" required/>
           <input type="password" name="password" onBlur={handleChange} placeholder="Enter Your password"  required/>
-          <input type="submit" value="Submit"/>
+          <input type="submit" value={newUser?'Sign Up' :'Sign In'}/>
         </form>
         
         {
