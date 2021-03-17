@@ -20,6 +20,7 @@ function App() {
     isSignedIn:false,
     name:'',
     photo:'',
+    password:'',
     email:''
   })
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -49,7 +50,9 @@ function App() {
         isSignedIn:false,
         name:'',
         photo:'',
-        email:''
+        email:'',
+        success:'true',
+        error:''
       }
       setUser(signOut);
     })
@@ -57,6 +60,54 @@ function App() {
       console.log(err);
     })
   }
+ 
+  const handleChange=(event)=>{
+    let  isFormValid=true;
+    if(event.target.name==='email'){
+      
+      //email validator part
+      isFormValid = /\S+@\S+\.\S+/.test(event.target.value);
+      // console.log(isEmailValid);
+
+    }
+    if(event.target.name==='password'){
+      // password validator part
+        const isPasswordValid = event.target.value.length>6;
+        const finalPassCheck =/\d{1}/.test(event.target.value);
+        isFormValid = finalPassCheck && isPasswordValid;
+    }
+    if(isFormValid){
+      console.log('form is valid');
+      const newUserInfo ={...user};
+      newUserInfo[event.target.name]=event.target.value;
+      setUser(newUserInfo);
+    }
+  }
+  const handleSubmit=(e)=>{
+    firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+  .then((userCredential) => {
+    // Signed in 
+    console.log('user created ')
+    const newUserInfo ={...user};
+    newUserInfo.success = true;
+    newUserInfo.error='';
+    setUser(newUserInfo);
+    // const user = userCredential.user;
+    console.log(user);
+    // ...
+  })
+  .catch((error) => {
+    const newUserInfo ={...user}
+    const errorCode = error.code;
+     newUserInfo.error = error.message;
+     newUserInfo.success=false;
+     setUser(newUserInfo)
+    console.log(errorCode);
+    // ..
+  });
+  e.preventDefault();
+  }
+  console.log(user.success);
   return (
     <div className="App">
       <header className="App-header">
@@ -68,6 +119,21 @@ function App() {
             <p>Your email : {user.email}</p>
             <img src={user.photo} alt=""/>
           </div>
+        }
+        <h1>My own made authentication system</h1>
+        {/* <p>Name : {user.name}</p> */}
+        <form onSubmit={handleSubmit} style={{display: 'flex',flexDirection:'column'}}>
+          <input type="text" name="name" onBlur={handleChange} placeholder="Enter Your Name" required/>
+          <input type="email" name="email" onBlur={handleChange} placeholder="Enter Your Email" required/>
+          <input type="password" name="password" onBlur={handleChange} placeholder="Enter Your password"  required/>
+          <input type="submit" value="Submit"/>
+        </form>
+        
+        {
+          
+        
+          user.success ?<p style={{color: 'green'}}>User Created Successfully</p>
+          :<p style={{color: 'red'}}>{user.error}</p>
         }
       </header>
     </div>
