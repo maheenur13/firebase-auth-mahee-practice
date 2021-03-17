@@ -16,6 +16,7 @@ if (!firebase.apps.length) {
 }
 
 function App() {
+  const [newUser,setNewUser]=useState(false);
   const [user,setUser]=useState({
     isSignedIn:false,
     name:'',
@@ -84,6 +85,7 @@ function App() {
     }
   }
   const handleSubmit=(e)=>{
+    if(newUser && user.email && user.password){
     firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
   .then((userCredential) => {
     // Signed in 
@@ -98,13 +100,34 @@ function App() {
   })
   .catch((error) => {
     const newUserInfo ={...user}
-    const errorCode = error.code;
+    // const errorCode = error.code;
      newUserInfo.error = error.message;
      newUserInfo.success=false;
      setUser(newUserInfo)
-    console.log(errorCode);
+    // console.log(errorCode);
     // ..
   });
+}
+if(!newUser && user.email && user.password){
+  firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+  .then((userCredential) => {
+    // Signed in
+    const newUserInfo ={...user};
+    newUserInfo.success = true;
+    newUserInfo.error='';
+    setUser(newUserInfo);
+    // var user = userCredential.user;
+    // ...
+  })
+  .catch((error) => {
+    const newUserInfo ={...user}
+     newUserInfo.error = error.message;
+     newUserInfo.success=false;
+     setUser(newUserInfo)
+    // var errorCode = error.code;
+    // var errorMessage = error.message;
+  });
+}
   e.preventDefault();
   }
   console.log(user.success);
@@ -120,19 +143,20 @@ function App() {
             <img src={user.photo} alt=""/>
           </div>
         }
+
+
         <h1>My own made authentication system</h1>
-        {/* <p>Name : {user.name}</p> */}
         <form onSubmit={handleSubmit} style={{display: 'flex',flexDirection:'column'}}>
-          <input type="text" name="name" onBlur={handleChange} placeholder="Enter Your Name" required/>
+          <input type="checkbox" name="check" onChange={()=>{setNewUser(!newUser)}} />
+          <label htmlFor="check">New User Sign Up</label>
+         { newUser && <input type="text" name="name" onBlur={handleChange} placeholder="Enter Your Name" required/>}
           <input type="email" name="email" onBlur={handleChange} placeholder="Enter Your Email" required/>
           <input type="password" name="password" onBlur={handleChange} placeholder="Enter Your password"  required/>
           <input type="submit" value="Submit"/>
         </form>
         
         {
-          
-        
-          user.success ?<p style={{color: 'green'}}>User Created Successfully</p>
+          user.success ?<p style={{color: 'green'}}>User {newUser?'Created!':'logged In Succesfully!'} Successfully</p>
           :<p style={{color: 'red'}}>{user.error}</p>
         }
       </header>
